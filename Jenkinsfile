@@ -37,7 +37,7 @@ pipeline {
                     echo "PR Commit: ${prCommit}"
 
                     // Save the changes in Python files to a single file
-                    bat(script: "git diff ${baseCommit} ${prCommit} -- \"*.py\" > code_changes.txt")
+                    bat(script: "git diff ${prCommit} ${baseCommit} -- \"*.py\" > code_changes.txt")
                 }
             }
         }
