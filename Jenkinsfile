@@ -4,38 +4,49 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                // Clean workspace before checkout
+                cleanWs()
+                
+                // Checkout the code from the repository
+                checkout([
+                    $class: 'GitSCM', 
+                    branches: [[name: '*/main']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, reference: '']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[url: 'https://github.com/your-username/your-repo.git']]
+                ])
             }
         }
 
-        stage('Build') {
+        stage('Get Changeset') {
             steps {
-                echo 'Building...'
+                script {
+                    // Get the last two commits for comparison
+                    def oldCommit = sh(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
+                    def newCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+
+                    echo "Old Commit: ${oldCommit}"
+                    echo "New Commit: ${newCommit}"
+
+                    // Save the changeset in a file to download later
+                    sh "git diff ${oldCommit} ${newCommit} > changeset.diff"
+                }
             }
         }
 
-        stage('Test') {
+        stage('Archive Changeset') {
             steps {
-                echo 'Testing...'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying...'
+                // Archive the changeset so it can be downloaded from Jenkins
+                archiveArtifacts artifacts: 'changeset.diff', allowEmptyArchive: true
             }
         }
     }
 
     post {
         always {
-            echo 'This will always run'
-        }
-        success {
-            echo 'This will run only if the build succeeds'
-        }
-        failure {
-            echo 'This will run only if the build fails'
+            // Clean up the workspace after the build
+            cleanWs()
         }
     }
 }
