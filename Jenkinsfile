@@ -23,25 +23,22 @@ pipeline {
             steps {
                 script {
                     // Get the last two commits for comparison
-                    def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
-                    def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    def oldCommit = sh(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
+                    def newCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
                     echo "Old Commit: ${oldCommit}"
                     echo "New Commit: ${newCommit}"
 
-                    // Save the old code to a file
-                    bat 'git show HEAD~1 > old_code.txt'
-
-                    // Save the new code to a file
-                    bat 'git show HEAD > new_code.txt'
+                    // Save the diff between the old and new code in a single file
+                    bat 'git diff HEAD~1 HEAD > code_changes.diff'
                 }
             }
         }
 
         stage('Archive Changeset') {
             steps {
-                // Archive the code files so they can be downloaded from Jenkins
-                archiveArtifacts artifacts: 'old_code.txt, new_code.txt', allowEmptyArchive: true
+                // Archive the diff file so it can be downloaded from Jenkins
+                archiveArtifacts artifacts: 'code_changes.diff', allowEmptyArchive: true
             }
         }
     }
