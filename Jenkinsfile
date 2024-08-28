@@ -26,14 +26,18 @@ pipeline {
                     //def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
                     //def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
-                    def baseCommit = bat(returnStdout: true, script: 'git merge-base origin/main HEAD').trim()
-                    def prCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    // Get the base commit and the latest commit
+                    bat(script: 'git merge-base origin/main HEAD > base_commit.txt', returnStdout: true)
+                    bat(script: 'git rev-parse HEAD > pr_commit.txt', returnStdout: true)
+
+                    def baseCommit = readFile('base_commit.txt').trim()
+                    def prCommit = readFile('pr_commit.txt').trim()
 
                     echo "Base Commit: ${baseCommit}"
                     echo "PR Commit: ${prCommit}"
 
                     // Save the changes in Python files to a single file
-                    bat(script: "git diff ${prCommit} ${baseCommit} -- \"*.py\" > code_changes.txt")
+                    bat(script: "git diff ${baseCommit} ${prCommit} -- \"*.py\" > code_changes.txt")
                 }
             }
         }
