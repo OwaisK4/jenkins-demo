@@ -23,8 +23,8 @@ pipeline {
             steps {
                 script {
                     // Get the last two commits for comparison
-                    def oldCommit = sh(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
-                    def newCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
+                    def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
                     echo "Old Commit: ${oldCommit}"
                     echo "New Commit: ${newCommit}"
@@ -38,7 +38,7 @@ pipeline {
         stage('Archive Changeset') {
             steps {
                 // Archive the changeset so it can be downloaded from Jenkins
-                archiveArtifacts artifacts: 'changeset.diff', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'changeset.txt', allowEmptyArchive: true
             }
         }
     }
