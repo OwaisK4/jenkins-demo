@@ -30,7 +30,7 @@ pipeline {
                     echo "New Commit: ${newCommit}"
 
                     // Save the changeset in a file to download later
-                    sh "git diff ${oldCommit} ${newCommit} > changeset.diff"
+                    bat 'git diff HEAD~1 HEAD --name-only > changeset.txt'
                 }
             }
         }
