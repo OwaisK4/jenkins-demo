@@ -29,16 +29,19 @@ pipeline {
                     echo "Old Commit: ${oldCommit}"
                     echo "New Commit: ${newCommit}"
 
-                    // Save the changeset in a file to download later
-                    bat 'git diff HEAD~1 HEAD --name-only > changeset.txt'
+                    // Save the old code to a file
+                    bat 'git show HEAD~1 > old_code.txt'
+
+                    // Save the new code to a file
+                    bat 'git show HEAD > new_code.txt'
                 }
             }
         }
 
         stage('Archive Changeset') {
             steps {
-                // Archive the changeset so it can be downloaded from Jenkins
-                archiveArtifacts artifacts: 'changeset.txt', allowEmptyArchive: true
+                // Archive the code files so they can be downloaded from Jenkins
+                archiveArtifacts artifacts: 'old_code.txt, new_code.txt', allowEmptyArchive: true
             }
         }
     }
