@@ -1,69 +1,51 @@
 pipeline {
     agent any
 
-    environment {
-        // Define paths and filenames
-        OLD_CODE_FILE = 'old_code.txt'
-        NEW_CODE_FILE = 'new_code.txt'
-        DIFF_FILE = 'diff.txt'
-    }
-
     stages {
         stage('Checkout') {
             steps {
+                //clean workspace b4 checkout
+                cleanWs()
+                
+                //checking the code from repository
+                checkout([
+                    $class: 'GitSCM', 
+                    branches: [[name: '*/main']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, reference: '']],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']]
+                ])
+            }
+        }
+
+        stage('Get Changeset') {
+            steps {
                 script {
-                    // Checkout the PR branch
-                    checkout([$class: 'GitSCM',
-                        userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']],
-                        branches: [[name: "origin/${env.CHANGE_BRANCH}"]]
-                    ])
+                    //get the lsat 2 recent commits and place them into a txt file
+                    def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
+                    def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+
+                    echo "Old Commit: ${oldCommit}"
+                    echo "New Commit: ${newCommit}"
+
+                    // Save the differences for .py files
+                    bat 'git diff HEAD~1 HEAD -- "*.py" > code_changes.txt'
                 }
             }
         }
 
-        stage('Fetch Previous Commit') {
+        stage('Archive Changeset') {
             steps {
-                script {
-                    // Fetch the previous commit from the base branch
-                    bat 'git fetch origin'
-                    bat "git checkout ${env.CHANGE_TARGET}"
-                    bat 'git pull origin ${env.CHANGE_TARGET}'
-                    bat "git batow ${env.CHANGE_TARGET} > ${env.OLD_CODE_FILE}"
-                }
-            }
-        }
-
-        stage('Get New Code') {
-            steps {
-                script {
-                    // Switch to the PR branch and get the new code
-                    bat "git checkout ${env.CHANGE_BRANCH}"
-                    bat "git batow ${env.CHANGE_BRANCH} > ${env.NEW_CODE_FILE}"
-                }
-            }
-        }
-
-        stage('Compare Changes') {
-            steps {
-                script {
-                    // Compare the old and new code
-                    bat "diff ${env.OLD_CODE_FILE} ${env.NEW_CODE_FILE} > ${env.DIFF_FILE}"
-                }
-            }
-        }
-
-        stage('Archive Artifacts') {
-            steps {
-                // Archive the diff file and any other relevant files
-                archiveArtifacts artifacts: "${env.DIFF_FILE}", allowEmptyArchive: true
+                //archive the txt file as an artifact so we can download it
+                archiveArtifacts artifacts: 'code_changes.txt', allowEmptyArchive: true
             }
         }
     }
 
     post {
         always {
-            // Clean up
-            deleteDir()
+            cleanWs()
         }
     }
 }
