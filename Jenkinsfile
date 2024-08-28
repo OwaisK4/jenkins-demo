@@ -2,11 +2,12 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Main Branch') {
+        stage('Checkout') {
             steps {
+                // Clean workspace before checkout
                 cleanWs()
 
-                // Checkout the main branch
+                // Checkout the code from the repository
                 checkout([
                     $class: 'GitSCM',
                     branches: [[name: '*/main']],
@@ -24,7 +25,7 @@ pipeline {
         stage('Checkout PR Branch') {
             steps {
                 script {
-                    // Checkout the pull request branch automatically
+                    // Checkout the feature branch (current PR branch)
                     checkout([
                         $class: 'GitSCM',
                         branches: [[name: "${env.CHANGE_BRANCH}"]],
@@ -34,8 +35,8 @@ pipeline {
                         userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']]
                     ])
                     
-                    // Save the latest commit hash from the PR branch
-                    bat(script: 'git rev-parse HEAD > pr_commit.txt', returnStdout: true)
+                    // Save the latest commit hash from the feature branch
+                    bat(script: 'git rev-parse HEAD > feature_commit.txt', returnStdout: true)
                 }
             }
         }
@@ -65,19 +66,15 @@ pipeline {
 
                     // ////////////////////////////////////////////////////////////////////////////////////////
                     def mainCommit = readFile('main_commit.txt').trim()
-                    def prCommit = readFile('pr_commit.txt').trim()
+                    def featureCommit = readFile('feature_commit.txt').trim()
 
                     echo "Main Commit: ${mainCommit}"
-                    echo "PR Commit: ${prCommit}"
+                    echo "Feature Commit: ${featureCommit}"
 
-                    // Ensure the diff command is correct
-                    def diffCommand = "git diff ${mainCommit} ${prCommit} -- \"*.py\""
-                    echo "Diff Command: ${diffCommand}"
-
-                    // Run the diff command
-                    bat(script: "${diffCommand} > code_changes.txt", returnStdout: true)
+                    // Get the diff between the feature branch and the main branch
+                    bat(script: "git diff ${mainCommit} ${featureCommit} -- \"*.py\" > code_changes.txt", returnStdout: true)
                     
-                    // Print out the content of the diff file for debugging
+                    // Display the content of the code_changes.txt file for debugging
                     bat(script: 'type code_changes.txt')
                 
                 }
