@@ -9,6 +9,7 @@ var = "hello world"
 a=5
 b=15
 sum = sum_func(a,b)
+sub = sub_func(b,a)
 
 print(sum)
-print(var)
+print(sub)
