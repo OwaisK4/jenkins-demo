@@ -14,7 +14,7 @@ pipeline {
                     doGenerateSubmoduleConfigurations: false,
                     extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, reference: '']],
                     submoduleCfg: [],
-                    userRemoteConfigs: [[url: 'https://github.com/your-username/your-repo.git']]
+                    userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']]
                 ])
             }
         }
