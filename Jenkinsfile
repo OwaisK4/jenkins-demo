@@ -14,7 +14,7 @@ pipeline {
                 script {
                     // Checkout the PR branch
                     checkout([$class: 'GitSCM',
-                        userRemoteConfigs: [[url: 'https://github.com/your-repo.git']],
+                        userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']],
                         branches: [[name: "origin/${env.CHANGE_BRANCH}"]]
                     ])
                 }
