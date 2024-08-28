@@ -23,14 +23,18 @@ pipeline {
             steps {
                 script {
                     //get the lsat 2 recent commits and place them into a txt file
-                    def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
-                    def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+                    //def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
+                    //def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
-                    echo "Old Commit: ${oldCommit}"
-                    echo "New Commit: ${newCommit}"
+                    def baseCommit = bat(returnStdout: true, script: 'git merge-base origin/main HEAD').trim()
+                    def prCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+
+                    
+                    echo "Base Commit: ${baseCommit}"
+                    echo "PR Commit: ${prCommit}"
 
                     // Save the differences for .py files
-                    bat 'git diff HEAD~1 HEAD -- "*.py" > code_changes.txt'
+                    bat 'git diff ${baseCommit} ${prCommit} -- "*.py" > code_changes.txt'
                 }
             }
         }
