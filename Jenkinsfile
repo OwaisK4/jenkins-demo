@@ -4,10 +4,10 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Clean workspace before checkout
+                //clean workspace b4 checkout
                 cleanWs()
                 
-                // Checkout the code from the repository
+                //checking the code from repository
                 checkout([
                     $class: 'GitSCM', 
                     branches: [[name: '*/main']],
@@ -22,7 +22,7 @@ pipeline {
         stage('Get Changeset') {
             steps {
                 script {
-                    // Get the last two commits for comparison
+                    //get the lsat 2 recent commits and place them into a txt file
                     def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
                     def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
@@ -37,7 +37,7 @@ pipeline {
 
         stage('Archive Changeset') {
             steps {
-                // Archive the code changes so they can be downloaded from Jenkins
+                //archive the txt file as an artifact so we can download it
                 archiveArtifacts artifacts: 'code_changes.txt', allowEmptyArchive: true
             }
         }
@@ -45,7 +45,6 @@ pipeline {
 
     post {
         always {
-            // Clean up the workspace after the build
             cleanWs()
         }
     }
