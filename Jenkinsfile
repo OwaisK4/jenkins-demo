@@ -2,22 +2,41 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Main Branch') {
             steps {
-                //clean workspace b4 checkout
                 cleanWs()
-                
-                //checking the code from repository
+
+                // Checkout the main branch
                 checkout([
-                    $class: 'GitSCM', 
+                    $class: 'GitSCM',
                     branches: [[name: '*/main']],
                     doGenerateSubmoduleConfigurations: false,
                     extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, reference: '']],
                     submoduleCfg: [],
                     userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']]
                 ])
-
+                
+                // Save the latest commit hash from the main branch
                 bat(script: 'git rev-parse HEAD > main_commit.txt', returnStdout: true)
+            }
+        }
+
+        stage('Checkout PR Branch') {
+            steps {
+                script {
+                    // Checkout the pull request branch automatically
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: "${env.CHANGE_BRANCH}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, reference: '']],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']]
+                    ])
+                    
+                    // Save the latest commit hash from the PR branch
+                    bat(script: 'git rev-parse HEAD > pr_commit.txt', returnStdout: true)
+                }
             }
         }
 
@@ -45,20 +64,22 @@ pipeline {
 
 
                     // ////////////////////////////////////////////////////////////////////////////////////////
-                    bat(script: 'git rev-parse HEAD > pr_commit.txt', returnStdout: true)
-                    
-                    // Read commit hashes
                     def mainCommit = readFile('main_commit.txt').trim()
                     def prCommit = readFile('pr_commit.txt').trim()
 
                     echo "Main Commit: ${mainCommit}"
                     echo "PR Commit: ${prCommit}"
 
-                    // Get the diff between the PR branch and the main branch
-                    bat(script: "git diff ${mainCommit} ${prCommit} -- \"*.py\" > code_changes.txt", returnStdout: true)
+                    // Ensure the diff command is correct
+                    def diffCommand = "git diff ${mainCommit} ${prCommit} -- \"*.py\""
+                    echo "Diff Command: ${diffCommand}"
+
+                    // Run the diff command
+                    bat(script: "${diffCommand} > code_changes.txt", returnStdout: true)
                     
-                    // Display the content of the code_changes.txt file for debugging
+                    // Print out the content of the diff file for debugging
                     bat(script: 'type code_changes.txt')
+                
                 }
             }
         }
