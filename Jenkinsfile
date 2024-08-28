@@ -8,23 +8,16 @@ pipeline {
         DIFF_FILE = 'diff.txt'
     }
 
-    triggers {
-        // Trigger the pipeline when a pull request is opened
-        githubPullRequest {
-            // Make sure you have the GitHub Pull Request Builder plugin installed and configured
-            triggerPhrase('retest')
-            useGitHubHooks()
-        }
-    }
-
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the PR branch
-                checkout([$class: 'GitSCM', 
-                    userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']], 
-                    branches: [[name: "origin/${env.CHANGE_BRANCH}"]]
-                ])
+                script {
+                    // Checkout the PR branch
+                    checkout([$class: 'GitSCM',
+                        userRemoteConfigs: [[url: 'https://github.com/your-repo.git']],
+                        branches: [[name: "origin/${env.CHANGE_BRANCH}"]]
+                    ])
+                }
             }
         }
 
