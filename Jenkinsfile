@@ -16,6 +16,8 @@ pipeline {
                     submoduleCfg: [],
                     userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']]
                 ])
+
+                bat(script: 'git rev-parse HEAD > main_commit.txt', returnStdout: true)
             }
         }
 
@@ -27,17 +29,36 @@ pipeline {
                     //def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
                     // Get the base commit and the latest commit
-                    bat(script: 'git merge-base origin/main HEAD > base_commit.txt', returnStdout: true)
-                    bat(script: 'git rev-parse HEAD > pr_commit.txt', returnStdout: true)
+                    //bat(script: 'git merge-base origin/main HEAD > base_commit.txt', returnStdout: true)
+                    //bat(script: 'git rev-parse HEAD > pr_commit.txt', returnStdout: true)
 
-                    def baseCommit = readFile('base_commit.txt').trim()
-                    def prCommit = readFile('pr_commit.txt').trim()
+                    //def baseCommit = readFile('base_commit.txt').trim()
+                    //def prCommit = readFile('pr_commit.txt').trim()
 
-                    echo "Base Commit: ${baseCommit}"
-                    echo "PR Commit: ${prCommit}"
+                    //echo "Base Commit: ${baseCommit}"
+                    //echo "PR Commit: ${prCommit}"
+
+                    
 
                     // Save the changes in Python files to a single file
-                    bat(script: "git diff ${prCommit} ${baseCommit} -- \"*.py\" > code_changes.txt")
+                    //bat(script: "git diff ${prCommit} ${baseCommit} -- \"*.py\" > code_changes.txt")
+
+
+                    // ////////////////////////////////////////////////////////////////////////////////////////
+                    bat(script: 'git rev-parse HEAD > pr_commit.txt', returnStdout: true)
+                    
+                    // Read commit hashes
+                    def mainCommit = readFile('main_commit.txt').trim()
+                    def prCommit = readFile('pr_commit.txt').trim()
+
+                    echo "Main Commit: ${mainCommit}"
+                    echo "PR Commit: ${prCommit}"
+
+                    // Get the diff between the PR branch and the main branch
+                    bat(script: "git diff ${mainCommit} ${prCommit} -- \"*.py\" > code_changes.txt", returnStdout: true)
+                    
+                    // Display the content of the code_changes.txt file for debugging
+                    bat(script: 'type code_changes.txt')
                 }
             }
         }
