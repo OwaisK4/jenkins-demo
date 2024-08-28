@@ -4,28 +4,29 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Clean workspace before checkout
+                //clean workspace b4 checkout
                 cleanWs()
-
-                // Checkout the code from the PR branch
+                
+                //checking the code from repository
                 checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: 'FETCH_HEAD']],
+                    $class: 'GitSCM', 
+                    branches: [[name: '*/main']],
                     doGenerateSubmoduleConfigurations: false,
-                    extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, reference: '']]],
+                    extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, reference: '']],
                     submoduleCfg: [],
-                    userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git', refspec: '+refs/pull/*:refs/remotes/origin/pr/*']]
+                    userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']]
                 ])
             }
         }
 
-        stage('Get Python File Changes') {
+        stage('Get Changeset') {
             steps {
                 script {
-                    // Get the base commit (last commit on main before PR was opened)
+                    //get the lsat 2 recent commits and place them into a txt file
+                    //def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
+                    //def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
+
                     def baseCommit = bat(returnStdout: true, script: 'git merge-base origin/main HEAD').trim()
-                    
-                    // Get the current commit (PR branch at the time of opening)
                     def prCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
 
                     echo "Base Commit: ${baseCommit}"
@@ -39,7 +40,7 @@ pipeline {
 
         stage('Archive Changeset') {
             steps {
-                // Archive the code changes file so it can be downloaded from Jenkins
+                //archive the txt file as an artifact so we can download it
                 archiveArtifacts artifacts: 'code_changes.txt', allowEmptyArchive: true
             }
         }
@@ -47,7 +48,6 @@ pipeline {
 
     post {
         always {
-            // Clean up the workspace after the build
             cleanWs()
         }
     }
