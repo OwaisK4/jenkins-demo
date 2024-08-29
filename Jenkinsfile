@@ -8,7 +8,7 @@ pipeline {
                     // Debugging: Print all environment variables
                     powershell 'gci env:\\ | ft name,value -autosize'
                     
-                    // Add a ref to git config to make it aware of main branch
+                    // Add a ref to git config to make it aware of the main branch
                     powershell '& git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
                     
                     // Fetch the main branch so you can do a diff against it
@@ -20,9 +20,9 @@ pipeline {
         stage('Generate Git Diff') {
             steps {
                 script {
-                    // Perform a diff and save the output to a text file using the correct PR source branch
+                    // Perform a diff for .py files and save the output with the actual changes to a text file
                     def diffOutput = powershell(returnStdout: true, script: '''
-                        git diff --name-only origin/main..origin/$env:GITHUB_PR_SOURCE_BRANCH > git_diff.txt
+                        git diff origin/main..origin/$env:GITHUB_PR_SOURCE_BRANCH -- *.py > git_diff.txt
                     ''').trim()
 
                     // Archive the git diff output as an artifact
