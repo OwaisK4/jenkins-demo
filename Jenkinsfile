@@ -3,12 +3,9 @@ pipeline {
 
     stages {
         stage('Prepare Environment') {
-            when {
-                changeRequest()
-            }
             steps {
                 script {
-                    // Print all environment variables for debugging
+                    // Debugging: Print all environment variables
                     powershell 'gci env:\\ | ft name,value -autosize'
                     
                     // Add a ref to git config to make it aware of main branch
@@ -21,9 +18,6 @@ pipeline {
         }
 
         stage('Generate Git Diff') {
-            when {
-                changeRequest()
-            }
             steps {
                 script {
                     // Perform a diff and save the output to a text file
