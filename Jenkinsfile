@@ -2,50 +2,39 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
-            steps {
-                //clean workspace b4 checkout
-                cleanWs()
-                
-                //checking the code from repository
-                checkout([
-                    $class: 'GitSCM', 
-                    branches: [[name: '*/main']],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [[$class: 'CleanBeforeCheckout'], [$class: 'CloneOption', noTags: false, shallow: false, depth: 0, reference: '']],
-                    submoduleCfg: [],
-                    userRemoteConfigs: [[url: 'https://github.com/RayyanMinhaj/jenkins-demo.git']]
-                ])
+        stage('Prepare Environment') {
+            when {
+                changeRequest()
             }
-        }
-
-        stage('Get Changeset') {
             steps {
                 script {
-                    //get the lsat 2 recent commits and place them into a txt file
-                    def oldCommit = bat(returnStdout: true, script: 'git rev-parse HEAD~1').trim()
-                    def newCommit = bat(returnStdout: true, script: 'git rev-parse HEAD').trim()
-
-                    echo "Old Commit: ${oldCommit}"
-                    echo "New Commit: ${newCommit}"
-
-                    // Save the differences for .py files
-                    bat 'git diff HEAD~1 HEAD -- "*.py" > code_changes.txt'
+                    // Print all environment variables for debugging
+                    powershell 'gci env:\\ | ft name,value -autosize'
+                    
+                    // Add a ref to git config to make it aware of main branch
+                    powershell '& git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
+                    
+                    // Fetch the main branch so you can do a diff against it
+                    powershell '& git fetch --no-tags'
                 }
             }
         }
 
-        stage('Archive Changeset') {
-            steps {
-                //archive the txt file as an artifact so we can download it
-                archiveArtifacts artifacts: 'code_changes.txt', allowEmptyArchive: true
+        stage('Generate Git Diff') {
+            when {
+                changeRequest()
             }
-        }
-    }
+            steps {
+                script {
+                    // Perform a diff and save the output to a text file
+                    def diffOutput = powershell(returnStdout: true, script: '''
+                        git diff --name-only origin/main..origin/$env:BRANCH_NAME > git_diff.txt
+                    ''').trim()
 
-    post {
-        always {
-            cleanWs()
+                    // Archive the git diff output as an artifact
+                    archiveArtifacts artifacts: 'git_diff.txt', allowEmptyArchive: false
+                }
+            }
         }
     }
 }
