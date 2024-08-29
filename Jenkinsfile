@@ -20,9 +20,9 @@ pipeline {
         stage('Generate Git Diff') {
             steps {
                 script {
-                    // Perform a diff and save the output to a text file
+                    // Perform a diff and save the output to a text file using the correct PR source branch
                     def diffOutput = powershell(returnStdout: true, script: '''
-                        git diff --name-only origin/main..origin/$env:BRANCH_NAME > git_diff.txt
+                        git diff --name-only origin/main..origin/$env:GITHUB_PR_SOURCE_BRANCH > git_diff.txt
                     ''').trim()
 
                     // Archive the git diff output as an artifact
