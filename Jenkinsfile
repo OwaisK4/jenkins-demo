@@ -52,7 +52,7 @@ pipeline {
             steps {
                 script {
                     // Archive the generated report as an artifact
-                    archiveArtifacts artifacts: 'PR_Report.txt', allowEmptyArchive: false
+                    archiveArtifacts artifacts: 'git_diff.txt, PR_Report.txt', allowEmptyArchive: false
                 }
             }
         }
