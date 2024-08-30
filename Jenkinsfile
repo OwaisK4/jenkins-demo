@@ -1,17 +1,20 @@
 pipeline {
     agent any
 
+    environment{
+        OPENAI_API_KEY = credentials('OPENAI_API_KEY')
+        PYTHON_PATH = "C:\\Users\\rayyan.minhaj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
+    }
+
     stages {
         stage('Prepare Environment') {
             steps {
                 script {
-                    // Debugging: Print all environment variables
+
                     powershell 'gci env:\\ | ft name,value -autosize'
                     
-                    // Add a ref to git config to make it aware of the main branch
                     powershell '& git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
                     
-                    // Fetch the main branch so you can do a diff against it
                     powershell '& git fetch --no-tags'
                 }
             }
@@ -29,6 +32,22 @@ pipeline {
                     archiveArtifacts artifacts: 'git_diff.txt', allowEmptyArchive: false
                 }
             }
+        }
+
+        stage('Generate Report'){
+            steps{
+                script{
+                    def reportOutput = powershell(script: "& ${env.PYTHON_PATH} generate_report.py git_diff.txt", returnStdout: true).trim()
+                    writeFile file: 'PR_Report.txt', text: reportOutput
+                }
+            }    
+        }
+        stage('Archive Reports'){
+            steps{
+                script{
+                    archiveArtifacts artifacts: 'git_diff.txt, PR_Report.txt', allowEmptyArchive: false
+                }
+            }           
         }
     }
 }
