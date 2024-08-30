@@ -34,11 +34,10 @@ pipeline {
         stage('Generate Report') {
             steps {
                 script {
-                    // Run the Python script to generate the report
-                    def reportOutput = powershell(script: 'python generate_report.py git_diff.txt', returnStdout: true).trim()
-
-                    // Save the report to a file
+                    
+                    def reportOutput = bat(script: 'python generate_report.py git_diff.txt', returnStdout: true).trim()
                     writeFile file: 'PR_Report.txt', text: reportOutput
+                    
                 }
             }
         }
