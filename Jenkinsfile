@@ -5,14 +5,13 @@ pipeline {
         stage('Prepare Environment') {
             steps {
                 script {
-                    //Debugging to check if env is setup correctly
+                    // Debugging: Print all environment variables
                     powershell 'gci env:\\ | ft name,value -autosize'
                     
-                    //This modifies git config so that main is recognised as ref
-                    //This is necessary so that git knows which branch to fetch and compare against.
+                    // Add a ref to git config to make it aware of the main branch
                     powershell '& git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
                     
-                    //This command fetches the latest changes from the remote repository, specifically the main branch.
+                    // Fetch the main branch so you can do a diff against it
                     powershell '& git fetch --no-tags'
                 }
             }
@@ -21,15 +20,34 @@ pipeline {
         stage('Generate Git Diff') {
             steps {
                 script {
-                    
-                    //This command compares the main branch with the source branch of the PR ($env:GITHUB_PR_SOURCE_BRANCH) for changes specifically in Python files (*.py). 
-                    //The output is saved to git_diff.txt. This is our change set.
+                    // Perform a diff for .py files and save the output with the actual changes to a text file
                     def diffOutput = powershell(returnStdout: true, script: '''
                         git diff origin/main..origin/$env:GITHUB_PR_SOURCE_BRANCH -- *.py > git_diff.txt
                     ''').trim()
 
-                    //Archive the git diff output as an artifact
-                    archiveArtifacts artifacts: 'git_diff.txt', allowEmptyArchive: false
+                    // Save the git_diff.txt file for use in the next stage
+                    writeFile file: 'git_diff.txt', text: diffOutput
+                }
+            }
+        }
+
+        stage('Generate Report') {
+            steps {
+                script {
+                    // Run the Python script to generate the report
+                    def reportOutput = sh(script: 'python3 generate_report.py git_diff.txt', returnStdout: true).trim()
+
+                    // Save the report to a file
+                    writeFile file: 'PR_Report.txt', text: reportOutput
+                }
+            }
+        }
+
+        stage('Archive Report') {
+            steps {
+                script {
+                    // Archive the generated report as an artifact
+                    archiveArtifacts artifacts: 'PR_Report.txt', allowEmptyArchive: false
                 }
             }
         }
