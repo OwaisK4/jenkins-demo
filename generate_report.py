@@ -54,7 +54,7 @@ def generate_report(diff_file):
     )
 
 
-    resp = response.choices[0].message['content']
+    resp = response.choices[0].message.content
 
     return resp
 
