@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     // Run the Python script to generate the report
-                    def reportOutput = sh(script: 'python3 generate_report.py git_diff.txt', returnStdout: true).trim()
+                    def reportOutput = powershell(script: 'python3 generate_report.py git_diff.txt', returnStdout: true).trim()
 
                     // Save the report to a file
                     writeFile file: 'PR_Report.txt', text: reportOutput
