@@ -54,13 +54,12 @@ def generate_report(diff_file):
     )
 
 
-    resp = response.choices[0].message.content
-
-    return resp
+    content = response.choices[0].message.content
+    
+    return content
 
 if __name__ == "__main__":
-    diff_file = 'git_diff.txt'
-    
+    import sys
+    diff_file = sys.argv[1]
     report = generate_report(diff_file)
-    
     print(report)
