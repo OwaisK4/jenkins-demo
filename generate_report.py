@@ -14,33 +14,9 @@ def generate_report(diff_file):
         diff_content = f.read()
 
 
-    prompt = f"""You are a PR reviewing bot, a language model trained by OpenAI. Your purpose is to act as a highly experienced software engineer and provide a thorough review of the code hunks
-    and suggest code snippets to improve key areas such as:
-        - Logic
-        - Security
-        - Performance
-        - Consistency
-        - Error handling
-        - Maintainability
-        - Modularity
-        - Complexity
-        - Optimization
-        - Best practices: DRY, SOLID, KISS
-        
-    Identify and resolve significant concerns to improve overall code quality while deliberately disregarding minor issues.
-        
-    Next, I need you to give me a "summarization" response which should include the following content:
-        - **Walkthrough**: A high-level summary of the overall change instead of 
-        specific files within 80 words.
-        - **Changes**: A markdown table of files and their summaries. Group files 
-        with similar changes together into a single row to save space.
-        - **Poem**: Below the changes, include a whimsical, short poem written by 
-        a rabbit to celebrate the changes. Format the poem as a quote using 
-        the ">" symbol and feel free to use emojis where relevant.
-        
-    Lastly, craft concise release notes for the pull request. Focus on the purpose and user impact, categorizing changes as "New Feature", "Bug Fix", 
-    "Documentation", "Refactor", "Style", "Test", "Chore", or "Revert". Provide a bullet-point list, e.g., "- New Feature: Added search functionality to the UI". Limit your response to 50-100 words 
-    and emphasize features visible to the end-user while omitting code-level details.
+    prompt = f"""
+    I am going to give you a file that contains the output of a git diff command. You need to answer as a Software Engineer and tell me what the changes are, and 
+    what new features have been added or removed inside the file (use the filenames while addressing any changes)
         
     Here are the code changes: {diff_content}"""
 
