@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         OPENAI_API_KEY = credentials('OPENAI_API_KEY') // Replace with your credentials ID
-        PATH = "C:\\Users\\rayyan.minhaj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
+        PYTHON_PATH = "C:\\Users\\rayyan.minhaj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
     }
 
     stages {
@@ -40,7 +40,7 @@ pipeline {
             steps {
                 script {
                     // Run the Python script to generate the report using the specified Python path
-                    def reportOutput = powershell(script: "& %PATH% generate_report.py git_diff.txt", returnStdout: true).trim()
+                    def reportOutput = powershell(script: "& ${env.PYTHON_PATH} generate_report.py git_diff.txt", returnStdout: true).trim()
                     
                     // Save the report to a file
                     writeFile file: 'PR_Report.txt', text: reportOutput
