@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        OPENAI_API_KEY = credentials('OPENAI_API_KEY') // Replace with your credentials ID
-        PYTHON_PATH = "C:\\Users\\rayyan.minhaj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
-    }
-
     stages {
         stage('Prepare Environment') {
             steps {
@@ -30,29 +25,8 @@ pipeline {
                         git diff origin/main..origin/$env:GITHUB_PR_SOURCE_BRANCH -- *.py > git_diff.txt
                     ''').trim()
 
-                    // Save the git_diff.txt file for use in the next stage
-                    writeFile file: 'git_diff.txt', text: diffOutput
-                }
-            }
-        }
-
-        stage('Generate Report') {
-            steps {
-                script {
-                    // Run the Python script to generate the report using the specified Python path
-                    def reportOutput = powershell(script: "& ${env.PYTHON_PATH} generate_report.py git_diff.txt", returnStdout: true).trim()
-                    
-                    // Save the report to a file
-                    writeFile file: 'PR_Report.txt', text: reportOutput
-                }
-            }
-        }
-
-        stage('Archive Report') {
-            steps {
-                script {
-                    // Archive the generated report as an artifact
-                    archiveArtifacts artifacts: 'git_diff.txt, PR_Report.txt', allowEmptyArchive: false
+                    // Archive the git diff output as an artifact
+                    archiveArtifacts artifacts: 'git_diff.txt', allowEmptyArchive: false
                 }
             }
         }
