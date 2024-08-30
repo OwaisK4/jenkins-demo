@@ -34,10 +34,13 @@ pipeline {
         stage('Generate Report') {
             steps {
                 script {
+                    // Update the path to Python executable
+                    def pythonPath = 'C:\\Users\\rayyan.minhaj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe'
+                    // Run the Python script to generate the report
+                    def reportOutput = powershell(script: "& '${pythonPath}' generate_report.py git_diff.txt", returnStdout: true).trim()
                     
-                    def reportOutput = bat(script: 'python generate_report.py git_diff.txt', returnStdout: true).trim()
+                    // Save the report to a file
                     writeFile file: 'PR_Report.txt', text: reportOutput
-                    
                 }
             }
         }
