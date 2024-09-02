@@ -16,7 +16,7 @@ def generate_report(diff_file):
 
     prompt = f"""
     I am going to give you a file that contains the output of a git diff command. You need to answer as a Software Engineer and tell me what the changes are, and 
-    what new features have been added or removed inside the file (use the filenames while addressing any changes)
+    what new features have been added or removed inside the file (use the filenames while addressing any changes). Please look for code duplication and alert it inside your response!
         
     Here are the code changes: {diff_content}"""
 
