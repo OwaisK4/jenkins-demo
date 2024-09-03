@@ -4,6 +4,7 @@ pipeline {
     environment{
         OPENAI_API_KEY = credentials('OPENAI_API_KEY')
         PYTHON_PATH = "C:\\Users\\rayyan.minhaj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
+        GITHUB_TOKEN = credentials('GITHUB_TOKEN')
     }
 
     stages {
@@ -46,6 +47,14 @@ pipeline {
             steps{
                 script{
                     archiveArtifacts artifacts: 'git_diff.txt, PR_Report.txt', allowEmptyArchive: false
+                }
+            }           
+        }
+
+        stage('Post PR Comment'){
+            steps{
+                script{
+                    powershell "& ${env.PYTHON_PATH} post_comment_pr.py"
                 }
             }           
         }
