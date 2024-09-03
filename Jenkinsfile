@@ -29,7 +29,7 @@ pipeline {
                     ''').trim()
 
                     // Archive the git diff output as an artifact
-                    archiveArtifacts artifacts: 'git_diff.txt', allowEmptyArchive: false
+                    //archiveArtifacts artifacts: 'git_diff.txt', allowEmptyArchive: false
                 }
             }
         }
