@@ -15,7 +15,8 @@ def generate_report(diff_file):
 
 
     prompt = f""" Use the following git diff file and generate a summary of all the changes that have occurred as if you were a PR reviewer bot. 
-    Here is the file: {diff_content}
+    Here is the file: {diff_content}.
+    Do NOT include any changes made to "generate_report.py" in your summary and ONLY include summary for other git diff commands.
        """
     
     
