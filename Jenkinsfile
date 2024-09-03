@@ -29,7 +29,7 @@ pipeline {
                     ''').trim()
 
                     // Archive the git diff output as an artifact
-                    //archiveArtifacts artifacts: 'git_diff.txt', allowEmptyArchive: false
+                    archiveArtifacts artifacts: 'git_diff.txt', allowEmptyArchive: false
                 }
             }
         }
@@ -45,7 +45,7 @@ pipeline {
         stage('Archive Reports'){
             steps{
                 script{
-                    archiveArtifacts artifacts: 'git_diff.txt, PR_Report.txt', allowEmptyArchive: false
+                    archiveArtifacts artifacts: 'PR_Report.txt', allowEmptyArchive: false
                 }
             }           
         }
