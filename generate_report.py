@@ -89,13 +89,13 @@ prompt = f"""
     [TRIAGE]: APPROVED"""
 
 
-    response = client.chat.completions.create(
-        model='gpt-3.5-turbo-16k',
-        messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
-        max_tokens=1000,
-        temperature=0.2,
-        top_p=1.0
-    )
+response = client.chat.completions.create(
+    model='gpt-3.5-turbo-16k',
+    messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
+    max_tokens=1000,
+    temperature=0.2,
+    top_p=1.0
+)
 
 
     content = response.choices[0].message.content
