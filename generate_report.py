@@ -15,17 +15,85 @@ def generate_report(diff_file):
 
 
     prompt = f"""
-    I am going to give you a file that contains the output of a git diff command. You need to answer as a Software Engineer and tell me what the changes are, and 
-    what new features have been added or removed inside the file (use the filenames while addressing any changes). Please look for code duplication and alert it inside your response!
-        
-    Here are the code changes: {diff_content}"""
+    You are `SparklingCleanCode.com`, a language model trained by OpenAI. Your purpose is to act as a highly experienced 
+    software engineer and provide a thorough review of the code hunks and suggest code snippets to improve key areas using the provided gitdiff file.
+    I would like you to succinctly summarize the diff within 100 words. If applicable, your summary should include a note about alterations 
+    to the signatures of exported functions, global data structures and variables, and any changes that might affect the external interface or 
+    behavior of the code.
+    
+    
+    Here is the git diff file: {diff_content}. If there are multiple git diffs here, then you need to output different reviews for each git diff command. The report you provide to me need to strictly adhere to the following output:
+    
+    
+    PR Title [This section can not be left empty]
+    - This should be replaced with a catchy title, should not exceed 4-5 words.
+    
+    Description [This section can not be left empty]
+    - This should be replaced with a brief description that elaborates on the changes that have occurred. MAX 3 sentences.
+    
+    File differences [This section can not be left empty]
+    - In this section, rather than explaining the changes, I want you to interpret and understand each line of code as if you are a software developer or a consultant. 
+    - List down each and every change that has occurred in as much detail as possible.
+    - Provide a line by line review of the given + and - lines.
+    - Make sure any redundancies (like repeating functions with different names are stated in this section).
+    
+    Instructions [This section can not be left empty]
+    Please provide a comprehensive report on the changes detailed in the diff. Your report should include:
+    
+    [These heading can not be left empty]
+    1. **Summary of Changes**: Offer a clear and concise summary of the modifications present in the diff. Highlight the key changes, including any adjustments to function signatures, global variables, or other elements that could impact the code’s external behavior or interface. Aim to summarize these changes within 150 words.
+    
+    2. **Impact Assessment**: Evaluate the potential impact of these changes on the overall system. Consider whether the changes introduce new functionality, modify existing functionality, or affect the code's logic. Indicate whether these changes might introduce any bugs or security issues. 
+    
+    3. **Triaging**: Based on your assessment, classify the diff as NEEDS_REVIEW or APPROVED according to the following criteria:
+       - **NEEDS_REVIEW**: If the diff involves modifications to code logic or functionality, including changes to control structures, function calls, or variable assignments.
+       - **APPROVED**: If the diff contains only minor changes such as formatting fixes or renaming variables that do not affect the code logic.
+      * If the diff involves any modifications to the logic or functionality, even if they seem minor, triage it as `NEEDS_REVIEW`. This includes changes to control structures, 
+      function calls, or variable assignments that might impact the behavior of the code.
+      * If the diff only contains very minor changes that don't affect the code logic, such as fixing typos, formatting, or renaming variables for clarity, triage it as `APPROVED`.
+    
+    Please provide the triage status clearly using the format below:
+    [TRIAGE]: <NEEDS_REVIEW or APPROVED>
+    
+    **IMPORTANT**:
+    - Do not include any explanations for the triage decision or details about potential impacts in the summary.
+    - Focus solely on delivering a succinct summary and an impact assessment.
+    - Please evaluate the diff thoroughly and take into account factors such as the number of lines changed, the potential impact on the overall system, and the likelihood of 
+    introducing new bugs or security vulnerabilities. When in doubt, always err on the side of caution and triage the diff as `NEEDS_REVIEW`.
+    - In your summary do not mention that the file needs a through review or caution about potential issues.
+    - Do not provide any reasoning why you triaged the diff as `NEEDS_REVIEW` or `APPROVED`.
+    - Do not mention that these changes affect the logic or functionality of the code in the summary. You must only use the triage status format above to indicate that.
+    - 
+    
+    
+    Example:
+    
+    Example PR Title
+    Example PR Description
+    Example File Differences 
+    
+    ---new_hunk---
+    + function add(x, y) 
+    +   return x + y;
+    + 
+    ---old_hunk---
+    - function add(x, y) 
+    -   return x + y;
+    - 
+    
+    ### Example Summary
+    
+    - **Summary**: Added a new `add` function that returns the sum of two numbers.
+    - **Impact**: This addition introduces new functionality that was previously missing. No existing functionality was altered.
+    
+    [TRIAGE]: APPROVED"""
 
 
     response = client.chat.completions.create(
         model='gpt-3.5-turbo-16k',
-        messages=[{"role": "assistant", "content": prompt}],
-        max_tokens=3000,
-        temperature=0.1,
+        messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}],
+        max_tokens=1000,
+        temperature=0.2,
         top_p=1.0
     )
 
