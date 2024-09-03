@@ -45,7 +45,7 @@ pipeline {
         stage('Archive Reports'){
             steps{
                 script{
-                    archiveArtifacts artifacts: 'PR_Report.txt', allowEmptyArchive: false
+                    archiveArtifacts artifacts: 'git_diff.txt, PR_Report.txt', allowEmptyArchive: false
                 }
             }           
         }
