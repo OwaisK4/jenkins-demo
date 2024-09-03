@@ -1,25 +1,14 @@
+from github import Github
 import os
-from dotenv import load_dotenv
-from octokit import Octokit
 
-load_dotenv()
-token = os.getenv('GITHUB_TOKEN')
-
-octokit = Octokit(token=token)
-
-owner = 'RayyanMinhaj'
-repo = 'jenkins-demo'
-pr_number = 1
-
-with open('PR_Report.txt', 'r') as file:
+with open('PR_report.txt', r) as file:
     pr_report_content = file.read()
 
+g = Github(os.getenv('GITHUB_TOKEN'))
 
-response = octokit.issues.create_comment(
-    owner=owner,
-    repo=repo,
-    issue_number=pr_number,
-    body=pr_report_content
-)
+repo = g.get_repo('RayyanMinhaj/jenkins-demo')
 
-print('Comment posted successfully:', response)
+pr_number = int(os.getenv('PR_NUMBER'))
+pull_request = repo.get_pull(pr_number)
+
+pull_request.create_issue_comment(pr_report_content)
