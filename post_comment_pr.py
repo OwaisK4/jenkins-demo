@@ -1,7 +1,7 @@
 from github import Github
 import os
 
-with open('PR_report.txt', r) as file:
+with open('PR_report.txt', 'r') as file:
     pr_report_content = file.read()
 
 g = Github(os.getenv('GITHUB_TOKEN'))
