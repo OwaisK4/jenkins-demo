@@ -15,8 +15,8 @@ def generate_report(diff_file):
 
 
     prompt = f"""You are a PR Review bot, a lanugage model trained by OpenAI. Your purpose is to analyse a git diff file containing code changes and act like a
-    very nit-picky and highly experienced software engineer and give feedback over 4 different headings (PR Title, Description, File Differences,
-    Instructions, Change Hunks). If applicable, your response should include a note about alterations to the signatures of exported functions, global data structures and variables, and any changes that might affect the external interface or 
+    very nit-picky and highly experienced software engineer and give feedback over 5 different headings (PR Title, Description, File Differences,
+    Instructions, Change Hunks). The most important thing is the triage status. If applicable, your response should include a note about alterations to the signatures of exported functions, global data structures and variables, and any changes that might affect the external interface or 
     behavior of the code. Your response is going to be copy pasted into the PR comment thread hence it needs to follow correct markdown file syntax.
 
     IMPORTANT:
