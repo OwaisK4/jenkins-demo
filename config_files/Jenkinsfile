@@ -34,31 +34,36 @@ pipeline {
                 }
             }
         }
-
-        stage('Generate Report'){
+        stage('Generate Disclaimer'){
             steps{
                 script{
-                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){
-                        def reportOutput = powershell(script: "& ${env.PYTHON_PATH} config_files/generate_report.py git_diff.txt", returnStdout: true).trim()
-                        writeFile file: 'PR_Report.txt', text: reportOutput
-                    }
+                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
+                        powershell "& ${env.PYTHON_PATH} config_files/disclaimer.py"
+                    }  
                 }
             }    
         }
-        stage('Archive Reports'){
+        stage('Generate Report'){
             steps{
                 script{
-                    archiveArtifacts artifacts: 'git_diff.txt, PR_Report.txt', allowEmptyArchive: false
+                    def reportOutput = powershell(script: "& ${env.PYTHON_PATH} config_files/generate_report.py git_diff.txt", returnStdout: true).trim()
+                    writeFile file: 'PR_Report.txt', text: reportOutput
                 }
-            }           
+            }    
         }
-
         stage('Post PR Comment'){
             steps{
                 script{
                     withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
                         powershell "& ${env.PYTHON_PATH} config_files/post_comment_pr.py"
                     }
+                }
+            }           
+        }
+        stage('Archive Reports'){
+            steps{
+                script{
+                    archiveArtifacts artifacts: 'git_diff.txt, PR_Report.txt', allowEmptyArchive: false
                 }
             }           
         }
