@@ -106,6 +106,24 @@ def generate_report(diff_file):
     return content
 
 if __name__ == "__main__":
+    from github import Github
+    g = Github(os.getenv('GITHUB_TOKEN'))
+    repo = g.get_repo('RayyanMinhaj/jenkins-demo')
+    pr_number = int(os.getenv('PR_NUMBER'))
+    pull_request = repo.get_pull(pr_number)
+
+    disclaimer = """
+        ### Welcome to `SparklingCleanCode.com`, your automated ** AI PR Review bot! **
+        Your report is being generated please wait...
+
+        > DISCLAIMER: GPT3.5 TURBO only has the capability to process 16,385 tokens and output 4,096 tokens.
+    """
+    pull_request.create_issue_comment(disclaimer)
+
+
+
+
+
     import sys
     diff_file = sys.argv[1]
     report = generate_report(diff_file)

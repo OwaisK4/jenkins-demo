@@ -38,8 +38,10 @@ pipeline {
         stage('Generate Report'){
             steps{
                 script{
-                    def reportOutput = powershell(script: "& ${env.PYTHON_PATH} generate_report.py git_diff.txt", returnStdout: true).trim()
-                    writeFile file: 'PR_Report.txt', text: reportOutput
+                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){
+                        def reportOutput = powershell(script: "& ${env.PYTHON_PATH} generate_report.py git_diff.txt", returnStdout: true).trim()
+                        writeFile file: 'PR_Report.txt', text: reportOutput
+                    }
                 }
             }    
         }
