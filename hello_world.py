@@ -8,18 +8,13 @@ def mult_func(a,b):
   c=a*b
   return c
 
-def div_func(a,b):
-  return a/b
 
 a=5
 b=14
 #sum = sum_func(a,b)
 mod = mod_func(b,a)
 mul = mult_func(a,b)
-div = div_func(a,b)
 
 print(sum)
 print(mul)
 print(mod)
-
-funny_func()
