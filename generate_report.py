@@ -112,12 +112,10 @@ if __name__ == "__main__":
     pr_number = int(os.getenv('PR_NUMBER'))
     pull_request = repo.get_pull(pr_number)
 
-    disclaimer = """
-        ### Welcome to `SparklingCleanCode.com`, your automated ** AI PR Review bot! **
-        Your report is being generated please wait...
+    disclaimer = """### Welcome to `SparklingCleanCode.com`, your automated AI PR Reviewing bot! 
+Your report is being generated please wait...
 
-        > DISCLAIMER: GPT3.5 TURBO only has the capability to process 16,385 tokens and output 4,096 tokens.
-    """
+> DISCLAIMER: GPT3.5 TURBO only has the capability to process 16,385 tokens and output 4,096 tokens."""
     pull_request.create_issue_comment(disclaimer)
 
 
