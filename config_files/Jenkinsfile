@@ -8,6 +8,15 @@ pipeline {
     }
 
     stages {
+        stage('Generate Disclaimer'){
+            steps{
+                script{
+                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
+                        powershell "& ${env.PYTHON_PATH} config_files/disclaimer.py"
+                    }  
+                }
+            }    
+        }
         stage('Prepare Environment') {
             steps {
                 script {
@@ -19,15 +28,6 @@ pipeline {
                     powershell '& git fetch --no-tags'
                 }
             }
-        }
-        stage('Post PR Comment'){
-            steps{
-                script{
-                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
-                        powershell "& ${env.PYTHON_PATH} config_files/post_comment_pr.py"
-                    }
-                }
-            }           
         }
         stage('Generate Git Diff') {
             steps {
@@ -42,15 +42,6 @@ pipeline {
                 }
             }
         }
-        stage('Generate Disclaimer'){
-            steps{
-                script{
-                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
-                        powershell "& ${env.PYTHON_PATH} config_files/disclaimer.py"
-                    }  
-                }
-            }    
-        }
         stage('Generate Report'){
             steps{
                 script{
@@ -58,6 +49,15 @@ pipeline {
                     writeFile file: 'PR_Report.txt', text: reportOutput
                 }
             }    
+        }
+        stage('Post PR Comment'){
+            steps{
+                script{
+                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
+                        powershell "& ${env.PYTHON_PATH} config_files/post_comment_pr.py"
+                    }
+                }
+            }           
         }
         stage('Archive Reports'){
             steps{
