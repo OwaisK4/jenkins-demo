@@ -68,8 +68,8 @@ def generate_report(diff_file):
 
     Example:
 
-    ## Refactor hello_world.py
-    ### This PR refactors the hello_world.py file by making changes to the sum_func and div_func functions. The sum_func function now assigns the sum of a and b to a new variable c before returning it. The div_func function has been removed entirely.
+    ### Refactor hello_world.py
+    This PR refactors the hello_world.py file by making changes to the sum_func and div_func functions. The sum_func function now assigns the sum of a and b to a new variable c before returning it. The div_func function has been removed entirely.
 
     ### File Differences 
     - The sum_func function has been modified to assign the sum of a and b to a new variable c before returning it.
