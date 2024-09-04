@@ -18,7 +18,7 @@ def generate_report(diff_file):
     software engineer and provide a thorough review of the code hunks and suggest code snippets to improve key areas using the provided gitdiff file.
     I would like you to succinctly summarize the diff within 100 words. If applicable, your summary should include a note about alterations 
     to the signatures of exported functions, global data structures and variables, and any changes that might affect the external interface or 
-    behavior of the code.
+    behavior of the code. Your response is going to be copy pasted into the PR comment thread hence it needs to follow correct markdown file syntax.
 
 
     Here is the git diff file: {diff_content}. If there are multiple git diffs here, then you need to output different reviews for each git diff command. The report you provide to me need to strictly adhere to the following output:
