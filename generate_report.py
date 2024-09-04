@@ -57,10 +57,10 @@ def generate_report(diff_file):
     * If the diff only contains very minor changes that don't affect the code logic, such as fixing typos, formatting, or renaming variables for clarity, triage it as `APPROVED`.
 
     Please provide the triage status clearly using the format below:
-    [TRIAGE]: <NEEDS_REVIEW or APPROVED>
+    [TRIAGE]: APPROVED OR NEEDS REVIEW [THIS CAN NOT BE LEFT EMPTY]
 
     Change Hunks - [This section is a heading can not be left empty]
-    Provide ALL the + and - lines that have been changed in this part
+    Provide ALL the + and - lines that have been changed in the code here. The lines with + in the beginning need to be highlighted in green and the lines with - need to be highlighted in red (green for added lines of code, red for removed lines of code)
 
 
 
