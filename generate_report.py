@@ -14,19 +14,12 @@ def generate_report(diff_file):
         diff_content = f.read()
 
 
-    prompt = f"""You are a PR Review bot, a lanugage model trained by OpenAI. Your purpose is to analyse a git diff file containing code changes and act like a
-    very nit-picky and highly experienced software engineer and give feedback over 4 different headings (PR Title, Description, File Differences,
-    Instructions, Change Hunks). If applicable, your response should include a note about alterations to the signatures of exported functions, global data structures and variables, and any changes that might affect the external interface or 
-    behavior of the code. Your response is going to be copy pasted into the PR comment thread hence it needs to follow correct markdown file syntax.
+    prompt = f"""You are `SparklingCleanCode.com' a language model trained by OpenAI. Your purpose is to act like a very nit-picky and highly experienced 
+    software engineer and provide a thorough review of the code hunks and suggest code snippets to improve key areas using the provided gitdiff file.
+    I would like you to succinctly summarize the diff within 100 words. If applicable, your summary should include a note about alterations 
+    to the signatures of exported functions, global data structures and variables, and any changes that might affect the external interface or 
+    behavior of the code.
 
-    IMPORTANT:
-    - Do not include any explanations for the triage decision or details about potential impacts in the summary.
-    - Focus solely on delivering a succinct summary and an impact assessment.
-    - Please evaluate the diff thoroughly and take into account factors such as the number of lines changed, the potential impact on the overall system, and the likelihood of 
-    introducing new bugs or security vulnerabilities. When in doubt, always err on the side of caution and triage the diff as `NEEDS_REVIEW`.
-    - In your summary do not mention that the file needs a through review or caution about potential issues.
-    - Do not provide any reasoning why you triaged the diff as `NEEDS_REVIEW` or `APPROVED`.
-    - Do not mention that these changes affect the logic or functionality of the code in the summary. You must only use the triage status format above to indicate that.
 
     Here is the git diff file: {lines}. If there are multiple git diffs here, then you need to output different reviews for each git diff command. The report you provide to me need to strictly adhere to the following output:
 
