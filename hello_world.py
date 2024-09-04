@@ -4,8 +4,8 @@ def mod_func(a,b):
 def funny_func():
   print("Yippeee!")
 
-def sub_func(a,b):
-  c=a-b
+def mult_func(a,b):
+  c=a*b
   return c
 
 def div_func(a,b):
@@ -15,11 +15,11 @@ a=5
 b=14
 #sum = sum_func(a,b)
 mod = mod_func(b,a)
-sub = sub_func(a,b)
+mul = mult_func(a,b)
 div = div_func(a,b)
 
 print(sum)
-print(sub)
+print(mul)
 print(mod)
 
 funny_func()
