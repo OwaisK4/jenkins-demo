@@ -59,7 +59,7 @@ def post_inline_comments(diff_file, ai_comments):
 
     commit_id = os.getenv('GIT_COMMIT')
     #commit = repo.get_commit(commit_id)
-    commit = repo.get_commits().reversed[0]
+    #commit = repo.get_commits().reversed[0]
     
 
     file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content) 
@@ -77,9 +77,10 @@ def post_inline_comments(diff_file, ai_comments):
                 pull_request.create_review_comment(
                     body=ai_comment.strip(), 
                     path=file_path, 
-                    commit=commit,
+                    commit=commit_id,
                     line=line_number,
-                    side=side  
+                    side=side,
+                    
                 )
             except Exception as e:
                 print(f"Error posting comment: {e}")
