@@ -62,7 +62,7 @@ def post_inline_comments(diff_content, ai_comments):
             pull_request.create_review_comment(
                 body=ai_comment.strip(), 
                 path=file_path, 
-                commit_id = commit_id,
+                commit = commit_id,
                 line=line_number,
                 side=side
             )
