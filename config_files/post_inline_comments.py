@@ -49,8 +49,6 @@ def generate_ai_comments(diff_file):
 
 
 
-
-
 def post_inline_comments(diff_file, ai_comments):
     with open(diff_file, 'r', encoding="utf-16-le") as f:
         diff_content = f.read()
@@ -60,8 +58,9 @@ def post_inline_comments(diff_file, ai_comments):
     comments = ai_comments.split('\n')
 
     commit_id = os.getenv('GIT_COMMIT')
-    commit = repo.get_commit(commit_id)
-
+    #commit = repo.get_commit(commit_id)
+    commit = repo.get_commits().reversed[0]
+    
 
     file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content) 
     file_path = file_path_match.group(1)
@@ -80,7 +79,7 @@ def post_inline_comments(diff_file, ai_comments):
                     path=file_path, 
                     commit=commit,
                     line=line_number,
-                    side=side
+                    side=side  
                 )
             except Exception as e:
                 print(f"Error posting comment: {e}")
