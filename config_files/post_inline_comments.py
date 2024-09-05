@@ -43,18 +43,17 @@ def generate_ai_comments(diff_file):
         top_p=1.0
     )
 
-    file_path = re.search(r'\+\+\+ b/(.+)', diff_content)
-    file_path = file_path.group(1)
 
-    return response.choices[0].message.content, file_path
 
+    return response.choices[0].message.content
 
 
 
 
-def post_inline_comments(diff_file, ai_comments, file_path):
-    #with open(diff_file, 'r') as f:
-    #    diff_content = f.read()
+
+def post_inline_comments(diff_file, ai_comments):
+    with open(diff_file, 'r', encoding="utf-16-le") as f:
+        diff_content = f.read()
 
     repo = g.get_repo(repo_name)
     pull_request = repo.get_pull(pr_number)
@@ -64,8 +63,8 @@ def post_inline_comments(diff_file, ai_comments, file_path):
     commit = repo.get_commit(commit_id)
 
 
-    #file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content)
-    #file_path = file_path_match.group(1)
+    file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content) 
+    file_path = file_path_match.group(1)
         
     
     for comment in comments:
@@ -93,7 +92,7 @@ if __name__ == "__main__":
     import sys
     diff_file = sys.argv[1]
 
-    ai_comments, fp = generate_ai_comments(diff_file)
+    ai_comments = generate_ai_comments(diff_file)
     print(ai_comments)
 
-    post_inline_comments(diff_file, ai_comments,fp)
+    post_inline_comments(diff_file, ai_comments)
