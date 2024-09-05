@@ -47,7 +47,7 @@ def generate_ai_comments(diff_content):
 def extract_file_from_diff(diff_content):
     #assumes only one file in git diff file [THIS NEEDS TO BE CHANGED LATER ON!]
     for line in diff_content.splitlines():
-        if line.startswith('+++ a/'):
+        if line.startswith('+++ b/'):
             return line[6:].strip()  #Extracts file path after '+++ b/'
     return None
 
@@ -60,12 +60,18 @@ def post_inline_comments(diff_content, ai_comments):
     commit_id = os.getenv('GIT_COMMIT')
     commit = repo.get_commit(commit_id)
 
+
+    for line in diff_content.splitlines():
+        if line.startswith('+++ b/'):
+            file_path = line[6:]
+
+
     for comment in comments:
         if comment.strip():
             line_info, ai_comment = comment.split(':', 1)
             line_number = int(line_info.strip().lstrip("+-"))
 
-            file_path = extract_file_from_diff(diff_content)
+            #file_path = extract_file_from_diff(diff_content)
 
             side = "RIGHT" if "+" in line_info else "LEFT"
 
