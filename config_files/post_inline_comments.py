@@ -48,7 +48,7 @@ def extract_file_from_diff(diff_content):
     #assumes only one file in git diff file [THIS NEEDS TO BE CHANGED LATER ON!]
     for line in diff_content.splitlines():
         if line.startswith('+++ b/'):
-            return line[6:]  #Extracts file path after '+++ b/'
+            return line[5:]  #Extracts file path after '+++ b/'
     return None
 
 
