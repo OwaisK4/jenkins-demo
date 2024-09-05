@@ -2,6 +2,7 @@ import os
 from github import Github
 from dotenv import load_dotenv
 from openai import Client
+import re
 
 load_dotenv()
 openai_key = os.getenv("OPENAI_API_KEY")
@@ -60,12 +61,6 @@ def post_inline_comments(diff_content, ai_comments):
     commit_id = os.getenv('GIT_COMMIT')
     commit = repo.get_commit(commit_id)
 
-    file_path = None
-
-    for line in diff_content.splitlines():
-        if line.startswith('+++ b/'):
-            file_path = line[6:]
-            break
 
 
     for comment in comments:
@@ -73,7 +68,8 @@ def post_inline_comments(diff_content, ai_comments):
             line_info, ai_comment = comment.split(':', 1)
             line_number = int(line_info.strip().lstrip("+-"))
 
-            #file_path = extract_file_from_diff(diff_content)
+            file_path = re.search(r'\+\+\+ b/(.+)', diff_content)
+            file_path = file_path.group(1)
 
             side = "RIGHT" if "+" in line_info else "LEFT"
 
