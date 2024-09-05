@@ -67,8 +67,15 @@ if __name__ == "__main__":
     commit_id = os.getenv('GIT_COMMIT')
     commit = repo.get_commit(commit_id)
 
-    file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content)
-    file_path = file_path_match.group(1)
+    #file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content)
+    #file_path = file_path_match.group(1)
+
+    file_path = 'hello_world.py'
+
+    #for line in diff_content.splitlines():
+    #    if line.startswith('+++ b/'):
+    #        file_path = line[6:]
+
 
     for comment in comments:
         if comment.strip():
