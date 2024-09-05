@@ -63,7 +63,7 @@ pipeline {
         stage('Post Inline Comment'){
             steps{
                 script{
-                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
+                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}", "GIT_COMMIT=${env.GIT_COMMIT}"]){ //i found this from the gci env cmd
                         powershell "& ${env.PYTHON_PATH} config_files/post_inline_comments.py git_diff.txt"
                     }
                 }
