@@ -48,8 +48,9 @@ def post_inline_comments(diff_content, ai_comments):
     repo = g.get_repo(repo_name)
     pull_request = repo.get_pull(pr_number)
     comments = ai_comments.split('\n')
-    commit_id = os.getenv('GIT_COMMIT')
 
+    commit_id = os.getenv('GIT_COMMIT')
+    commit = repo.get_commit(commit_id)
 
     for comment in comments:
         if comment.strip():
@@ -63,7 +64,7 @@ def post_inline_comments(diff_content, ai_comments):
             pull_request.create_review_comment(
                 body=ai_comment.strip(), 
                 path=file_path, 
-                commit= commit_id,
+                commit= commit,
                 line=line_number,
                 side=side
             )
