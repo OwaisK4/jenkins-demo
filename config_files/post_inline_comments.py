@@ -48,6 +48,7 @@ def post_inline_comments(diff_content, ai_comments):
     repo = g.get_repo(repo_name)
     pull_request = repo.get_pull(pr_number)
     comments = ai_comments.split('\n')
+    commit_id = pull_request.head.sha
 
     for comment in comments:
         if comment.strip():
@@ -56,7 +57,15 @@ def post_inline_comments(diff_content, ai_comments):
 
             file_path = extract_file_from_diff(diff_content)
 
-            pull_request.create_review_comment(body=ai_comment.strip(), path=file_path, position=line_number)
+            side = "RIGHT" if "+" in line_info else "LEFT"
+
+            pull_request.create_review_comment(
+                body=ai_comment.strip(), 
+                path=file_path, 
+                commit_id = commit_id,
+                line=line_number,
+                side=side
+            )
 
 
 def extract_file_from_diff(diff_content):
