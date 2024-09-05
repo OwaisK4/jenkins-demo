@@ -57,7 +57,7 @@ def post_inline_comments(diff_file, ai_comments):
 
     with open(diff_file, 'r') as f:
         diff_content = f.read()
-        
+
 
     repo = g.get_repo(repo_name)
     pull_request = repo.get_pull(pr_number)
@@ -66,15 +66,14 @@ def post_inline_comments(diff_file, ai_comments):
     commit_id = os.getenv('GIT_COMMIT')
     commit = repo.get_commit(commit_id)
 
-
+    file_path = re.search(r'\+\+\+ b/(.+)', diff_content)
+    file_path = file_path.group(1)
 
     for comment in comments:
         if comment.strip():
             line_info, ai_comment = comment.split(':', 1)
             line_number = int(line_info.strip().lstrip("+-"))
 
-            file_path = re.search(r'\+\+\+ b/(.+)', diff_content)
-            file_path = file_path.group(1)
 
             side = "RIGHT" if "+" in line_info else "LEFT"
 
