@@ -23,16 +23,22 @@ def generate_ai_comments(diff_file):
     
     prompt = f"""
     You are reviewing code changes in a GitHub pull request. For each line added (marked with '+') or removed (marked with '-'), 
-    provide a helpful, detailed comment about what the code does and any potential improvements or issues. You need to generate comments for every line.
+    provide a detailed comment about what the code does and any potential improvements or issues. 
+
     Here is the git diff file:
     {diff_content}
 
     Your response should strictly follow this format for each change:
-    LINE NUMBER: COMMENT
+    LINE NUMBER (relative to the file): COMMENT
 
     Example:
     + 12: This function adds two numbers and returns the result. Consider error handling.
     - 15: This line removes error handling for null values, which may cause issues.
+
+    Note:
+    - Line numbers should be based on the context provided by the diff hunk.
+    - Provide comments for both additions (lines starting with '+') and removals (lines starting with '-').
+    - If a line number does not have a corresponding comment, skip it.
     """
 
     response = client.chat.completions.create(
