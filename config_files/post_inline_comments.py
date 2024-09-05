@@ -14,12 +14,12 @@ g = Github(github_token)
 repo_name = 'RayyanMinhaj/jenkins-demo'
 pr_number = int(os.getenv('PR_NUMBER'))
 
-def read_diff_file(diff_file):
-    with open(diff_file, 'r') as file:
-        return file.read()
-    
 
-def generate_ai_comments(diff_content):
+
+def generate_ai_comments(diff_file):
+    with open(diff_file, 'r') as f:
+        diff_content = f.read()
+    
     prompt = f"""
     You are reviewing code changes in a GitHub pull request. For each line added (marked with '+') or removed (marked with '-'), 
     provide a helpful, detailed comment about what the code does and any potential improvements or issues. You need to generate comments for every line.
@@ -53,7 +53,12 @@ def extract_file_from_diff(diff_content):
     return None
 
 
-def post_inline_comments(diff_content, ai_comments):
+def post_inline_comments(diff_file, ai_comments):
+
+    with open(diff_file, 'r') as f:
+        diff_content = f.read()
+        
+
     repo = g.get_repo(repo_name)
     pull_request = repo.get_pull(pr_number)
     comments = ai_comments.split('\n')
@@ -88,9 +93,7 @@ if __name__ == "__main__":
     import sys
     diff_file = sys.argv[1]
 
-    diff_content = read_diff_file(diff_file)
+    ai_comments = generate_ai_comments(diff_file)
 
-    ai_comments = generate_ai_comments(diff_content)
-
-    post_inline_comments(diff_content, ai_comments)
+    post_inline_comments(diff_file, ai_comments)
 
