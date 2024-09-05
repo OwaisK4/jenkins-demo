@@ -7,6 +7,7 @@ pipeline {
         GITHUB_TOKEN = credentials('GITHUB_TOKEN')
     }
 
+
     stages {
         stage('Generate Disclaimer'){
             steps{
@@ -55,6 +56,15 @@ pipeline {
                 script{
                     withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
                         powershell "& ${env.PYTHON_PATH} config_files/post_comment_pr.py"
+                    }
+                }
+            }           
+        }
+        stage('Post Inline Comment'){
+            steps{
+                script{
+                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
+                        powershell "& ${env.PYTHON_PATH} config_files/post_inline_comments.py git_diff.txt"
                     }
                 }
             }           
