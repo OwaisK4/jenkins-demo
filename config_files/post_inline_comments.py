@@ -57,7 +57,7 @@ def post_inline_comments(diff_file, ai_comments):
     pull_request = repo.get_pull(pr_number)
     comments = ai_comments.split('\n')
 
-    commit_id = os.getenv('GITHUB_PR_HEAD_SHA')
+    commit_id = os.getenv('GIT_COMMIT')
     #commit = repo.get_commit(commit_id)
     #commit = repo.get_commits().reversed[0]
     
