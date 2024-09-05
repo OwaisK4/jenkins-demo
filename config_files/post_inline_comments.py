@@ -60,10 +60,12 @@ def post_inline_comments(diff_content, ai_comments):
     commit_id = os.getenv('GIT_COMMIT')
     commit = repo.get_commit(commit_id)
 
+    file_path = None
 
     for line in diff_content.splitlines():
         if line.startswith('+++ b/'):
             file_path = line[6:]
+            break
 
 
     for comment in comments:
