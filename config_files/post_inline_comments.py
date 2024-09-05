@@ -44,6 +44,14 @@ def generate_ai_comments(diff_content):
     return response.choices[0].message.content
 
 
+def extract_file_from_diff(diff_content):
+    #assumes only one file in git diff file [THIS NEEDS TO BE CHANGED LATER ON!]
+    for line in diff_content.splitlines():
+        if line.startswith('+++ b/'):
+            return line[6:]  #Extracts file path after '+++ b/'
+    return None
+
+
 def post_inline_comments(diff_content, ai_comments):
     repo = g.get_repo(repo_name)
     pull_request = repo.get_pull(pr_number)
@@ -70,12 +78,6 @@ def post_inline_comments(diff_content, ai_comments):
             )
 
 
-def extract_file_from_diff(diff_content):
-    #assumes only one file in git diff file [THIS NEEDS TO BE CHANGED LATER ON!]
-    for line in diff_content.splitlines():
-        if line.startswith('+++ b/'):
-            return line[6:]  #Extracts file path after '+++ b/'
-    return None
 
 
 if __name__ == "__main__":
