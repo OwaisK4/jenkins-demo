@@ -65,7 +65,18 @@ def post_inline_comments(diff_file, ai_comments):
     file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content) 
     file_path = file_path_match.group(1)
         
+
+
+    hunk_lines = []
+    for line in diff_content.splitlines():
+        if line.startswith('+++ b/'):
+            file_path = line[6:].strip()
+        elif line.startswith('@@'):
+            hunk_lines.append(line)
     
+
+
+
     for comment in comments:
         if comment.strip():
             try:
@@ -73,6 +84,16 @@ def post_inline_comments(diff_file, ai_comments):
                 line_number = int(line_info.strip().lstrip("+-"))
 
                 side = "RIGHT" if "+" in line_info else "LEFT"
+
+
+
+                matching_hunk = next((hunk for hunk in hunk_lines if f"{line_number}" in hunk), None)
+                if not matching_hunk:
+                    print(f"No matching hunk found for line {line_number}, skipping comment.")
+                    continue
+
+
+
 
                 pull_request.create_review_comment(
                     body=ai_comment.strip(), 
