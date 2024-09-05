@@ -47,11 +47,11 @@ def generate_ai_comments(diff_file):
 
 def post_inline_comments(diff_file, ai_comments):
 
-    with open(diff_file, 'r') as f:
+    with open(diff_file, 'r', encoding='utf-8') as f:
         diff_content = f.read()
 
-    print("Diff File Content:")
-    print(diff_content)  # Debug print
+    #print("Diff File Content:")
+    #print(diff_content)  # Debug print
 
     repo = g.get_repo(repo_name)
     pull_request = repo.get_pull(pr_number)
@@ -60,6 +60,7 @@ def post_inline_comments(diff_file, ai_comments):
     commit_id = os.getenv('GIT_COMMIT')
     commit = repo.get_commit(commit_id)
 
+    #extracting file path
     file_path = re.search(r'\+\+\+ b/(.+)', diff_content)
     file_path = file_path.group(1)
 
