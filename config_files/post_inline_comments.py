@@ -1,6 +1,8 @@
 import os
+import re
 from dotenv import load_dotenv
 from openai import Client
+from github import Github
 
 
 load_dotenv()
@@ -47,3 +49,46 @@ if __name__ == "__main__":
     diff_file = sys.argv[1]
     report = generate_report(diff_file)
     print(report)
+
+    ## Now we publish the inline comments
+    with open(diff_file, 'r') as f:
+        diff_content = f.read()
+
+    github_token = os.getenv("GITHUB_TOKEN")
+    g = Github(github_token)
+    repo_name = 'RayyanMinhaj/jenkins-demo'
+    pr_number = int(os.getenv('PR_NUMBER'))
+
+    repo = g.get_repo(repo_name)
+    pull_request = repo.get_pull(pr_number)
+    
+    comments = report.split('\n')
+
+    commit_id = os.getenv('GIT_COMMIT')
+    commit = repo.get_commit(commit_id)
+
+    file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content)
+    file_path = file_path_match.group(1)
+
+    for comment in comments:
+        if comment.strip():
+            line_info, ai_comment = comment.split(':', 1)
+            line_number = int(line_info.strip().lstrip("+-"))
+
+            side = "RIGHT" if "+" in line_info else "LEFT"
+
+            pull_request.create_review_comment(
+                body=ai_comment.strip(), 
+                path=file_path, 
+                commit=commit,
+                line=line_number,
+                side=side
+            )
+
+
+
+
+
+
+
+

@@ -63,8 +63,10 @@ pipeline {
         stage('Post Inline Comment'){
             steps{
                 script{
-                    def reportOutput = powershell(script: "& ${env.PYTHON_PATH} config_files/post_inline_comments.py git_diff.txt", returnStdout: true).trim()
-                    writeFile file: 'PR_Inline_Report.txt', text: reportOutput
+                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}", "GIT_COMMIT=${env.GIT_COMMIT}"]){
+                        def reportOutput = powershell(script: "& ${env.PYTHON_PATH} config_files/post_inline_comments.py git_diff.txt", returnStdout: true).trim()
+                        writeFile file: 'PR_Inline_Report.txt', text: reportOutput
+                    }
                 }
             }           
         }
