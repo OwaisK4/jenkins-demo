@@ -1,8 +1,8 @@
 def mod_func(a,b):
   return a%b
 
-def funny_func():
-  print("Yippeee!")
+def addition_func(a,b):
+  return a+b
 
 def mult_func(a,b):
   c=a*b
@@ -10,8 +10,8 @@ def mult_func(a,b):
 
 
 a=5
-b=14
-#sum = sum_func(a,b)
+b=11
+sum = addition_func(a,b)
 mod = mod_func(b,a)
 mul = mult_func(a,b)
 
