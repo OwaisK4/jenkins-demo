@@ -18,7 +18,7 @@ pr_number = int(os.getenv('PR_NUMBER'))
 commit_sha = os.getenv('GITHUB_PR_HEAD_SHA')
 
 
-octokit = Octokit(auth={"token": github_token})
+octokit = Octokit(auth=github_token)
 
 def generate_ai_comments(diff_file):
     with open(diff_file, 'r') as f:
