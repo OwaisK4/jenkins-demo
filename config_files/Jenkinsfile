@@ -12,14 +12,16 @@ pipeline {
         stage('Get PR Author') {
             steps {
                 script {
-                    def prAuthor = bat(script: "${env.PYTHON_PATH} config_files/filter_users.py", returnStdout: true).trim()
-                    echo "PR Author: '${prAuthor}'"
-                    
-                    def approvedDevelopers = ['RayyanMinhaj'] //List of approved developers
-                    
-                    if (!approvedDevelopers.contains(prAuthor)) {
-                        error("Pipeline stopped: Developer not approved.")
-                    }
+                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ 
+                        def prAuthor = powershell(script: "& ${env.PYTHON_PATH} config_files/filter_users.py", returnStdout: true).trim()
+                        echo "PR Author: '${prAuthor}'"
+                        
+                        def approvedDevelopers = ['RayyanMinhaj'] //List of approved developers
+                        
+                        if (!approvedDevelopers.contains(prAuthor)) {
+                            error("Pipeline stopped: Developer not approved.")
+                        }
+                    }   
                 }
             }
         }
