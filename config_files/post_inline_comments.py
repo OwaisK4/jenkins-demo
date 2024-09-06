@@ -148,7 +148,7 @@ def post_inline_comments(diff_file, ai_comments):
                 pull_request.create_review_comment(
                     body=ai_comment.strip(), 
                     path=file_path, 
-                    commit=commit.sha, #added .sha here for more specificity
+                    commit=commit,
                     line=line_number,
                     side=side
                     
