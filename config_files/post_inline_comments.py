@@ -57,43 +57,53 @@ def generate_ai_comments(diff_file):
 #################### Functions Added #############################
 
 def parse_diff_file(diff_content):
-    #"""Parse the diff file and return a list of tuples containing hunk details."""
-    file_path = None
+    """Parse the diff file and return a list of tuples containing hunk details."""
     hunks = []
     current_hunk = None
-    line_offset = 0
+    hunk_content = []
 
     for line in diff_content.splitlines():
         if line.startswith('+++ b/'):
             file_path = line[6:].strip()
         elif line.startswith('@@'):
-            # Extract the hunk header info
+            if current_hunk:
+                current_hunk['lines'] = hunk_content
+                hunks.append(current_hunk)
             hunk_info = re.match(r'@@ -(\d+),\d+ \+(\d+),\d+ @@', line)
             if hunk_info:
-                old_line = int(hunk_info.group(1))  # Original file's starting line number
-                new_line = int(hunk_info.group(2))  # New file's starting line number
-                current_hunk = {'new_start': new_line, 'lines': [], 'file_path': file_path}
-                hunks.append(current_hunk)
+                old_line = int(hunk_info.group(1))
+                new_line = int(hunk_info.group(2))
+                current_hunk = {
+                    'new_start': new_line,
+                    'lines': [],
+                    'file_path': file_path,
+                    'diff_hunk': line
+                }
+                hunk_content = []
         elif current_hunk is not None:
-            current_hunk['lines'].append(line)
+            hunk_content.append(line)
+    
+    if current_hunk:
+        current_hunk['lines'] = hunk_content
+        hunks.append(current_hunk)
 
     return hunks
 
 
 def get_hunk_line_number(hunks, line_number, side):
-    #"""Match a line number from OpenAI's response to the correct hunk line number."""
+    """Match a line number from OpenAI's response to the correct hunk line number."""
     for hunk in hunks:
         hunk_line_number = hunk['new_start']
         for line in hunk['lines']:
             if side == "RIGHT" and line.startswith('+'):
                 if hunk_line_number == line_number:
-                    return hunk_line_number, hunk['file_path']
+                    return hunk_line_number, hunk['file_path'], hunk['diff_hunk']
                 hunk_line_number += 1
             elif side == "LEFT" and line.startswith('-'):
                 if hunk_line_number == line_number:
-                    return hunk_line_number, hunk['file_path']
+                    return hunk_line_number, hunk['file_path'], hunk['diff_hunk']
                 hunk_line_number += 1
-    return None, None
+    return None, None, None
 
 #####################################################################################
 
@@ -137,8 +147,8 @@ def post_inline_comments(diff_file, ai_comments):
 
 
 
-                matching_hunk = get_hunk_line_number(hunks, line_number, side)
-                if not matching_hunk or not file_path:
+                matching_line, file_path, diff_hunk = get_hunk_line_number(hunks, line_number, side)
+                if not matching_line or not file_path or not diff_hunk:
                     print(f"No matching hunk found for line {line_number}, skipping comment.")
                     continue
 
@@ -149,10 +159,15 @@ def post_inline_comments(diff_file, ai_comments):
                     body=ai_comment.strip(), 
                     path=file_path, 
                     commit=commit,
-                    line=line_number,
-                    side=side
-                    
+                    #line=line_number,
+                    line=matching_line,
+                    side=side,
+                    start_side="RIGHT" if side == "RIGHT" else "LEFT",
+                    start_line=matching_line,
+                    diff_hunk=diff_hunk 
                 )
+
+                
             except Exception as e:
                 print(f"Error posting comment: {e}")
 
