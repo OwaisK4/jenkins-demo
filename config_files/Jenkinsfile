@@ -9,20 +9,6 @@ pipeline {
 
 
     stages {
-        stage('Check Developer') {
-            steps {
-                script {
-                    def prAuthor = env.CHANGE_AUTHOR //Fetch PR author or PR owner?
-                    def approvedDevelopers = ['RayyanMinhaj'] 
-                    
-                    echo prAuthor
-
-                    //if (!approvedDevelopers.contains(prAuthor)) {
-                    //    error("Pipeline stopped: Developer not approved.")
-                    //}
-                }
-            }
-        }
         stage('Generate Disclaimer'){
             steps{
                 script{
@@ -41,6 +27,20 @@ pipeline {
                     powershell '& git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
                     
                     powershell '& git fetch --no-tags'
+                }
+            }
+        }
+        stage('Check Developer') {
+            steps {
+                script {
+                    def prAuthor = env.CHANGE_AUTHOR //Fetch PR author or PR owner?
+                    def approvedDevelopers = ['RayyanMinhaj'] 
+                    
+                    echo prAuthor
+
+                    //if (!approvedDevelopers.contains(prAuthor)) {
+                    //    error("Pipeline stopped: Developer not approved.")
+                    //}
                 }
             }
         }
