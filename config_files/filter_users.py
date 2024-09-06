@@ -10,10 +10,10 @@ def get_pr_author(repo_name, pr_number):
     pr = repo.get_pull(pr_number)
 
     pr_author = pr.user.login
-    return pr_author
+    return str(pr_author)
 
 if __name__ == "__main__":
-    
+
     repo_name = 'RayyanMinhaj/jenkins-demo'  
     pr_number = int(os.getenv('GITHUB_PR_NUMBER'))  
     author = get_pr_author(repo_name, pr_number)
