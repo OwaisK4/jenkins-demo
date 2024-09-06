@@ -12,7 +12,7 @@ pipeline {
         stage('Get PR Author') {
             steps {
                 script {
-                    def prAuthor = bat(script: "${env.PYTHON_PATH} filter_users.py", returnStdout: true).trim()
+                    def prAuthor = bat(script: "${env.PYTHON_PATH} config_files/filter_users.py", returnStdout: true).trim()
                     echo "PR Author: ${prAuthor}"
                     
                     def approvedDevelopers = ['RayyanMinhaj'] //List of approved developers
