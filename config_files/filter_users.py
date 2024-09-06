@@ -9,8 +9,8 @@ def get_pr_author(repo_name, pr_number):
     repo = g.get_repo(repo_name)
     pr = repo.get_pull(pr_number)
 
-    pr_author = pr.user.login
-    return str(pr_author)
+    pr_author = pr.user.login.strip()
+    return pr_author
 
 if __name__ == "__main__":
 
