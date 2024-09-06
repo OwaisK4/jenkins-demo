@@ -54,6 +54,50 @@ def generate_ai_comments(diff_file):
     return response.choices[0].message.content
 
 
+#################### Functions Added #############################
+
+def parse_diff_file(diff_content):
+    #"""Parse the diff file and return a list of tuples containing hunk details."""
+    file_path = None
+    hunks = []
+    current_hunk = None
+    line_offset = 0
+
+    for line in diff_content.splitlines():
+        if line.startswith('+++ b/'):
+            file_path = line[6:].strip()
+        elif line.startswith('@@'):
+            # Extract the hunk header info
+            hunk_info = re.match(r'@@ -(\d+),\d+ \+(\d+),\d+ @@', line)
+            if hunk_info:
+                old_line = int(hunk_info.group(1))  # Original file's starting line number
+                new_line = int(hunk_info.group(2))  # New file's starting line number
+                current_hunk = {'new_start': new_line, 'lines': [], 'file_path': file_path}
+                hunks.append(current_hunk)
+        elif current_hunk is not None:
+            current_hunk['lines'].append(line)
+
+    return hunks
+
+
+def get_hunk_line_number(hunks, line_number, side):
+    #"""Match a line number from OpenAI's response to the correct hunk line number."""
+    for hunk in hunks:
+        hunk_line_number = hunk['new_start']
+        for line in hunk['lines']:
+            if side == "RIGHT" and line.startswith('+'):
+                if hunk_line_number == line_number:
+                    return hunk_line_number, hunk['file_path']
+                hunk_line_number += 1
+            elif side == "LEFT" and line.startswith('-'):
+                if hunk_line_number == line_number:
+                    return hunk_line_number, hunk['file_path']
+                hunk_line_number += 1
+    return None, None
+
+#####################################################################################
+
+
 
 def post_inline_comments(diff_file, ai_comments):
     with open(diff_file, 'r', encoding="utf-16-le") as f:
@@ -65,7 +109,6 @@ def post_inline_comments(diff_file, ai_comments):
 
     commit_id = os.getenv('GITHUB_PR_HEAD_SHA')
     commit = repo.get_commit(commit_id)
-    #commit = repo.get_commits().reversed[0]
     
 
     file_path_match = re.search(r'\+\+\+ b/(.+)', diff_content) 
@@ -73,13 +116,14 @@ def post_inline_comments(diff_file, ai_comments):
         
 
 
-    hunk_lines = []
-    for line in diff_content.splitlines():
-        if line.startswith('+++ b/'):
-            file_path = line[6:].strip()
-        elif line.startswith('@@'):
-            hunk_lines.append(line)
+    #hunk_lines = []
+    #for line in diff_content.splitlines():
+    #    if line.startswith('+++ b/'):
+    #        file_path = line[6:].strip()
+    #    elif line.startswith('@@'):
+    #        hunk_lines.append(line)
     
+    hunks = parse_diff_file(diff_content)
 
 
 
@@ -93,8 +137,8 @@ def post_inline_comments(diff_file, ai_comments):
 
 
 
-                matching_hunk = next((hunk for hunk in hunk_lines if f"{line_number}" in hunk), None)
-                if not matching_hunk:
+                matching_hunk = get_hunk_line_number(hunks, line_number, side)
+                if not matching_hunk or not file_path:
                     print(f"No matching hunk found for line {line_number}, skipping comment.")
                     continue
 
@@ -104,7 +148,7 @@ def post_inline_comments(diff_file, ai_comments):
                 pull_request.create_review_comment(
                     body=ai_comment.strip(), 
                     path=file_path, 
-                    commit=commit,
+                    commit=commit.sha, #added .sha here for more specificity
                     line=line_number,
                     side=side
                     
