@@ -9,7 +9,7 @@ def mult_func(a,b):
   return c
 
 
-a=5
+a=51
 b=11
 sum = addition_func(a,b)
 mod = mod_func(b,a)
