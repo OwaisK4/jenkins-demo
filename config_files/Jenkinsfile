@@ -59,7 +59,7 @@ pipeline {
                     //     git diff origin/main...origin/$env:GITHUB_PR_SOURCE_BRANCH -- *.py > git_diff.txt
                     // ''').trim()
                     def diffOutput = sh(returnStdout: true, script: '''
-                        git diff origin/main...origin/$env:GITHUB_PR_SOURCE_BRANCH -- *.py > git_diff.txt
+                        git diff origin/main...origin/$GITHUB_PR_SOURCE_BRANCH -- *.py > git_diff.txt
                     ''').trim()
 
                     // Archive the git diff output as an artifact
