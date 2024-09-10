@@ -41,7 +41,7 @@ pipeline {
                 script {
 
                     // powershell 'gci env:\\ | ft name,value -autosize'
-                    sh 'printenv | awk -F= '{printf "%-30s %s\n", $1, $2}' | column -t'
+                    // sh "printenv | awk -F= '{printf "%-30s %s\n", $1, $2}' | column -t"
                     
                     // powershell '& git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
                     sh 'git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
