@@ -3,7 +3,7 @@ pipeline {
 
     environment{
         OPENAI_API_KEY = credentials('OPENAI_API_KEY')
-        PYTHON_PATH = "C:\\Users\\rayyan.minhaj\\AppData\\Local\\Programs\\Python\\Python312\\python.exe"
+        PYTHON_PATH = "/usr/bin/python"
         GITHUB_TOKEN = credentials('GITHUB_TOKEN')
     }
 
@@ -13,10 +13,11 @@ pipeline {
             steps {
                 script {
                     withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ 
-                        def prAuthor = powershell(script: "& ${env.PYTHON_PATH} config_files/filter_users.py", returnStdout: true).trim()
+                        // def prAuthor = powershell(script: "& ${env.PYTHON_PATH} config_files/filter_users.py", returnStdout: true).trim()
+                        prAuthor=$("${PYTHON_PATH}" config_files/filter_users.py | xargs)
                         echo "PR Author: '${prAuthor}'"
                         
-                        def approvedDevelopers = ['RayyanMinhaj'] //List of approved developers
+                        def approvedDevelopers = ['RayyanMinhaj', 'OwaisK4'] //List of approved developers
                         
                         if (!approvedDevelopers.contains(prAuthor)) {
                             error("Pipeline stopped: Developer not approved.")

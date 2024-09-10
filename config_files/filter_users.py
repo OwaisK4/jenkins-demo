@@ -1,6 +1,9 @@
 from github import Github
 import os
 import sys
+from dotenv import load_dotenv
+load_dotenv()
+
 
 def get_pr_author(repo_name, pr_number):
     token = os.getenv('GITHUB_TOKEN')
@@ -13,8 +16,7 @@ def get_pr_author(repo_name, pr_number):
     return pr_author
 
 if __name__ == "__main__":
-
-    repo_name = 'RayyanMinhaj/jenkins-demo'  
-    pr_number = int(os.getenv('GITHUB_PR_NUMBER'))  
+    repo_name = 'OwaisK4/jenkins-demo'
+    pr_number = int(os.getenv('GITHUB_PR_NUMBER'))
     author = get_pr_author(repo_name, pr_number)
     print(author)
