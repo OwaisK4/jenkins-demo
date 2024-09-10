@@ -59,7 +59,10 @@ def post_inline_comments(diff_file, ai_comments):
 
     # Extract file path and hunks from git diff
     file_hunks = re.findall(r'@@ (.*) @@', diff_content)
-    file_path = re.search(r'\+\+\+ b/(.+)', diff_content).group(1)
+    try:
+        file_path = re.search(r'\+\+\+ b/(.+)', diff_content).group(1)
+    except:
+        file_path = "Couldn't find file path in diff_content"
 
     for comment in comments:
         if comment.strip():
