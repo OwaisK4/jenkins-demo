@@ -80,7 +80,7 @@ pipeline {
         stage('Post PR Comment'){
             steps{
                 script{
-                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
+                    withEnv(["GITHUB_PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
                         sh "${env.PYTHON_PATH} config_files/post_comment_pr.py"
                         // powershell "& ${env.PYTHON_PATH} config_files/post_comment_pr.py"
                     }
