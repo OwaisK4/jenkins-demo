@@ -29,10 +29,10 @@ pipeline {
         stage('Generate Disclaimer'){
             steps{
                 script{
-                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
+                    withEnv(["GITHUB_PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
                         // powershell "& ${env.PYTHON_PATH} config_files/disclaimer.py"
-
-                    }  
+                        sh(script: "${env.PYTHON_PATH} config_files/disclaimer.py")
+                    }
                 }
             }    
         }
@@ -40,11 +40,14 @@ pipeline {
             steps {
                 script {
 
-                    powershell 'gci env:\\ | ft name,value -autosize'
+                    // powershell 'gci env:\\ | ft name,value -autosize'
+                    sh 'printenv | awk -F= '{printf "%-30s %s\n", $1, $2}' | column -t'
                     
-                    powershell '& git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
+                    // powershell '& git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
+                    sh 'git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main'
                     
-                    powershell '& git fetch --no-tags'
+                    // powershell '& git fetch --no-tags'
+                    sh 'git fetch --no-tags'
                 }
             }
         }
@@ -52,7 +55,10 @@ pipeline {
             steps {
                 script {
                     // Perform a diff for .py files and save the output with the actual changes to a text file
-                    def diffOutput = powershell(returnStdout: true, script: '''
+                    // def diffOutput = powershell(returnStdout: true, script: '''
+                    //     git diff origin/main...origin/$env:GITHUB_PR_SOURCE_BRANCH -- *.py > git_diff.txt
+                    // ''').trim()
+                    def diffOutput = sh(returnStdout: true, script: '''
                         git diff origin/main...origin/$env:GITHUB_PR_SOURCE_BRANCH -- *.py > git_diff.txt
                     ''').trim()
 
@@ -64,7 +70,9 @@ pipeline {
         stage('Generate Report'){
             steps{
                 script{
-                    def reportOutput = powershell(script: "& ${env.PYTHON_PATH} config_files/generate_report.py git_diff.txt", returnStdout: true).trim()
+                    // def reportOutput = powershell(script: "& ${env.PYTHON_PATH} config_files/generate_report.py git_diff.txt", returnStdout: true).trim()
+                    // writeFile file: 'PR_Report.txt', text: reportOutput
+                    def reportOutput = sh(script: "${env.PYTHON_PATH} config_files/generate_report.py git_diff.txt", returnStdout: true).trim()
                     writeFile file: 'PR_Report.txt', text: reportOutput
                 }
             }    
@@ -73,7 +81,8 @@ pipeline {
             steps{
                 script{
                     withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}"]){ //i found this from the gci env cmd
-                        powershell "& ${env.PYTHON_PATH} config_files/post_comment_pr.py"
+                        sh "${env.PYTHON_PATH} config_files/post_comment_pr.py"
+                        // powershell "& ${env.PYTHON_PATH} config_files/post_comment_pr.py"
                     }
                 }
             }           
@@ -81,8 +90,9 @@ pipeline {
         stage('Post Inline Comment'){
             steps{
                 script{
-                    withEnv(["PR_NUMBER=${env.GITHUB_PR_NUMBER}", "GITHUB_PR_HEAD_SHA=${env.GITHUB_PR_HEAD_SHA}"]){
-                        def reportOutput = powershell(script: "& ${env.PYTHON_PATH} config_files/post_inline_comment_octokit.py git_diff.txt", returnStdout: true).trim()
+                    withEnv(["GITHUB_PR_NUMBER=${env.GITHUB_PR_NUMBER}", "GITHUB_PR_HEAD_SHA=${env.GITHUB_PR_HEAD_SHA}"]){
+                        // def reportOutput = powershell(script: "& ${env.PYTHON_PATH} config_files/post_inline_comment_octokit.py git_diff.txt", returnStdout: true).trim()
+                        def reportOutput = sh(script: "${env.PYTHON_PATH} config_files/post_inline_comment_octokit.py git_diff.txt", returnStdout: true).trim()
                         writeFile file: 'PR_Inline_Report.txt', text: reportOutput
                     }
                 }

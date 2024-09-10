@@ -6,9 +6,9 @@ with open('PR_report.txt', 'r') as file:
 
 g = Github(os.getenv('GITHUB_TOKEN'))
 
-repo = g.get_repo('RayyanMinhaj/jenkins-demo')
+repo = g.get_repo('OwaisK4/jenkins-demo')
 
-pr_number = int(os.getenv('PR_NUMBER'))
+pr_number = int(os.getenv('GITHUB_PR_NUMBER'))
 pull_request = repo.get_pull(pr_number)
 
 pull_request.create_issue_comment(pr_report_content)

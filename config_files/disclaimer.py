@@ -1,11 +1,13 @@
 from github import Github
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 g = Github(os.getenv('GITHUB_TOKEN'))
 
-repo = g.get_repo('RayyanMinhaj/jenkins-demo')
+repo = g.get_repo('OwaisK4/jenkins-demo')
 
-pr_number = int(os.getenv('PR_NUMBER'))
+pr_number = int(os.getenv('GITHUB_PR_NUMBER'))
 pull_request = repo.get_pull(pr_number)
 
 disclaimer = """### Welcome to `SparklingCleanCode.com`, your automated AI PR Reviewing bot! 

@@ -13,8 +13,8 @@ github_token = os.getenv("GITHUB_TOKEN")
 client = Client(api_key=openai_key)
 g = Github(github_token)
 
-repo_name = 'RayyanMinhaj/jenkins-demo'
-pr_number = int(os.getenv('PR_NUMBER'))
+repo_name = 'OwaisK4/jenkins-demo'
+pr_number = int(os.getenv('GITHUB_PR_NUMBER'))
 commit_sha = os.getenv('GITHUB_PR_HEAD_SHA')
 
 
@@ -75,7 +75,7 @@ def post_inline_comments(diff_file, ai_comments):
 
                 # Post inline comment using Octokit
                 octokit.pulls.create_review_comment(
-                    owner="RayyanMinhaj",
+                    owner="OwaisK4",
                     repo="jenkins-demo",
                     pull_number=pr_number,
                     commit_id=commit_sha,
