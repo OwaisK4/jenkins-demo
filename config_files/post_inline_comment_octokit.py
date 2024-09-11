@@ -52,7 +52,7 @@ def generate_ai_comments(diff_file):
 
 
 def post_inline_comments(diff_file, ai_comments):
-    with open(diff_file, 'r', encoding="utf-16-le") as f:
+    with open(diff_file, 'r') as f:
         diff_content = f.read()
 
     comments = ai_comments.split('\n')
